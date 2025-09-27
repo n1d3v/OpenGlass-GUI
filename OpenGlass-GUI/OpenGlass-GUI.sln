@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.36422.26
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenGlass-GUI", "OpenGlass-GUI.csproj", "{A8322EEB-7BE5-4031-BAFC-2EA5D8525857}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A8322EEB-7BE5-4031-BAFC-2EA5D8525857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8322EEB-7BE5-4031-BAFC-2EA5D8525857}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8322EEB-7BE5-4031-BAFC-2EA5D8525857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8322EEB-7BE5-4031-BAFC-2EA5D8525857}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BB4DBEEF-9B77-4F17-B3B0-0DF69542068F}
+	EndGlobalSection
+EndGlobal
