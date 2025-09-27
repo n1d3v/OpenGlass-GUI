@@ -16,8 +16,9 @@ namespace OpenGlass_GUI
     public partial class Util : Form
     {
         private string ogRegPath = @"SOFTWARE\Microsoft\Windows\DWM";
+        private string savePath = @"C:\values.txt"; // Escape backslash
 
-        // related to the refreshing of openglass
+        // related to refreshing of OpenGlass
         const int WM_THEMECHANGED = 0x031A;
         const int WM_DWMCOLORIZATIONCOLORCHANGED = 0x0320;
 
@@ -30,7 +31,40 @@ namespace OpenGlass_GUI
         public Util()
         {
             InitializeComponent();
+            ReadShaderValues();
             ReadCaptionValues();
+        }
+
+        private void ReadCheckBoxValues()
+        {
+
+        }
+
+        private void ReadShaderValues()
+        {
+            string valueName = "GlassType";
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(ogRegPath))
+            {
+                if (key != null)
+                {
+                    object value = key.GetValue(valueName);
+                    if (value != null && shaderBox != null)
+                    {
+                        switch (value.ToString())
+                        {
+                            case "0":
+                                shaderBox.SelectedItem = "Vista style shader";
+                                break;
+                            case "1":
+                                shaderBox.SelectedItem = "Aero style shader";
+                                break;
+                            default:
+                                shaderBox.SelectedItem = "Aero style shader";
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         private void ReadCaptionValues()
@@ -41,7 +75,7 @@ namespace OpenGlass_GUI
                 if (key != null)
                 {
                     object value = key.GetValue(valueName);
-                    if (value != null)
+                    if (value != null && captionBox != null)
                     {
                         switch (value.ToString())
                         {
@@ -57,18 +91,48 @@ namespace OpenGlass_GUI
                             case "3":
                                 captionBox.SelectedItem = "Windows 8.x style";
                                 break;
+                            default:
+                                captionBox.SelectedItem = "Windows 10 style (Default)";
+                                break;
                         }
                     }
-                    else
+                }
+            }
+        }
+
+        private void shaderBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (shaderBox?.SelectedItem == null)
+                return;
+
+            var selectedItem = shaderBox.SelectedItem;
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(ogRegPath, writable: true))
+            {
+                if (key != null)
+                {
+                    switch (selectedItem.ToString())
                     {
-                        captionBox.SelectedItem = "Windows 10 style (Default)";
+                        case "Vista style shader":
+                            SetRegistryValue(key, "GlassType", 0, RegistryValueKind.DWord);
+                            break;
+                        case "Aero style shader":
+                            SetRegistryValue(key, "GlassType", 1, RegistryValueKind.DWord);
+                            break;
                     }
+                    RefreshOpenGlass();
+                }
+                else
+                {
+                    MessageBox.Show("We could not change the value, please reopen the app with Administrator.");
                 }
             }
         }
 
         private void captionBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (captionBox?.SelectedItem == null)
+                return;
+
             var selectedItem = captionBox.SelectedItem;
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey(ogRegPath, writable: true))
             {
@@ -98,10 +162,30 @@ namespace OpenGlass_GUI
             }
         }
 
+        private void glassBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (glassBox == null) return;
+
+            bool isChecked = glassBox.Checked;
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(ogRegPath, writable: true))
+            {
+                if (key != null)
+                {
+                    SetRegistryValue(key, "ColorizationOpaqueBlend", isChecked ? 100 : 0, RegistryValueKind.DWord);
+                    RefreshOpenGlass();
+                }
+                else
+                {
+                    MessageBox.Show("We could not change the value, please reopen the app with Administrator.");
+                }
+            }
+        }
+
         private void centerBox_CheckedChanged(object sender, EventArgs e)
         {
-            bool isChecked = centerBox.Checked;
+            if (centerBox == null) return;
 
+            bool isChecked = centerBox.Checked;
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey(ogRegPath, writable: true))
             {
                 if (key != null)
@@ -133,7 +217,16 @@ namespace OpenGlass_GUI
 
         private void SetRegistryValue(RegistryKey key, string valueName, object value, RegistryValueKind valueKind)
         {
-            key.SetValue(valueName, value, valueKind);
+            if (key == null || string.IsNullOrWhiteSpace(valueName)) return;
+
+            try
+            {
+                key.SetValue(valueName, value, valueKind);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to write to registry: {ex.Message}");
+            }
         }
     }
 }
